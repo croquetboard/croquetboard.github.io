@@ -197,9 +197,6 @@
                 x -= canvas_rectangle.left;
                 y -= canvas_rectangle.top;
                 
-                x = Math.min(Math.max(x, 0), gameCanvas.width);
-                y = Math.min(Math.max(y, 0), gameCanvas.height);
-
                 if (event.type == "mousedown" || event.type == "touchstart") {
                     var closestDistance = Number.MAX_VALUE;
                     var closestBall;
@@ -227,9 +224,9 @@
                 }
 
                 if (event.type == "mousemove" || event.type == "touchmove") {
-                    if (draggingBall != -1) {
-                        balls[draggingBall].x = x - draggingOffsetX;
-                        balls[draggingBall].y = y - draggingOffsetY;
+                    if (draggingBall != -1) {                                
+                        balls[draggingBall].x = Math.min(Math.max(x - draggingOffsetX, 0), gameCanvas.width);
+                        balls[draggingBall].y = Math.min(Math.max(y - draggingOffsetY, 0), gameCanvas.height);
 
                         for (var i = 0; i < balls.length; i++) {
                             if (i == draggingBall) {
