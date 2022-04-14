@@ -2,7 +2,7 @@
 
 <html>
     <head>
-        <title>Croquet Balls</title>
+        <title>Croquet Board</title>
 
         <style>
             :root {
@@ -10,8 +10,8 @@
                 --lawn: hsl(135deg, 60%, 40%);
 
                 --hoop: hsl(0deg, 0%, 95%);
-                --hoopblue: hsl(220deg 85% 50%);
-                --hoopred: hsl(0deg 75% 55%);
+                --hoop-blue: hsl(220deg 85% 50%);
+                --hoop-red: hsl(0deg 75% 55%);
 
                 --black: hsl(0deg 0% 15%);
                 --blue: hsl(220deg 85% 40%);
@@ -64,10 +64,10 @@
             var yard;
 
             var balls = [
-                { x: 28 / 2 - 4, y: 35 / 2, color: "black" },
-                { x: 28 / 2 - 2, y: 35 / 2, color: "blue" },
-                { x: 28 / 2 + 2, y: 35 / 2, color: "red" },
-                { x: 28 / 2 + 4, y: 35 / 2, color: "yellow" },
+                { x: 28 / 2 - 2 * 3, y: 35 / 2, color: "black" },
+                { x: 28 / 2 - 1 * 3, y: 35 / 2, color: "blue" },
+                { x: 28 / 2 + 1 * 3, y: 35 / 2, color: "red" },
+                { x: 28 / 2 + 2 * 3, y: 35 / 2, color: "yellow" },
             ];
 
             var ballRadius = 0.4;
@@ -77,8 +77,8 @@
                 { x: 7 + 7, y: 7 + 3.5 },
                 { x: 28 - 7, y: 7 },
 
-                { x: 7, y: 35 - 7, color: "hoopblue" },
-                { x: 7 + 7, y: 35 - 7 - 3.5, color: "hoopred" },
+                { x: 7, y: 35 - 7, color: "hoop-blue" },
+                { x: 7 + 7, y: 35 - 7 - 3.5, color: "hoop-red" },
                 { x: 28 - 7, y: 35 - 7 },
             ];
 
@@ -277,20 +277,23 @@
             context.canvas.addEventListener("touchmove", handleInput, { passive: false });
             context.canvas.addEventListener("touchstart", handleInput, { passive: false });
 
-            function setFavicon() {
+            function setFavicon(rel, d) {
                 var canvas = document.createElement("canvas");
-                var d = 192;
                 canvas.width = d;
                 canvas.height = d;
                 var context = canvas.getContext("2d");
-                fillCircle(context, d/2, d/2, d/2, getColor("blue"));
+                fillCircle(context, d / 4, d / 4, d / 4, getColor("blue"));
+                fillCircle(context, (d / 4) * 3, d / 4, d / 4, getColor("red"));
+                fillCircle(context, d / 4, (d / 4) * 3, d / 4, getColor("black"));
+                fillCircle(context, (d / 4) * 3, (d / 4) * 3, d / 4, getColor("yellow"));
                 var link = document.createElement("link");
-                link.rel = "icon apple-touch-icon";
+                link.rel = rel;
                 link.href = canvas.toDataURL();
                 document.getElementsByTagName("head")[0].appendChild(link);
             }
 
-            setFavicon();
+            setFavicon("icon", 180);
+            setFavicon("apple-touch-icon", 180);
         </script>
     </body>
 </html>
