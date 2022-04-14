@@ -192,9 +192,11 @@
                 }
 
                 var canvas_rectangle = context.canvas.getBoundingClientRect();
-
                 x -= canvas_rectangle.left;
                 y -= canvas_rectangle.top;
+                
+                x = Math.min(Math.max(x, 0), gameCanvas.width);
+                y = Math.min(Math.max(y, 0), gameCanvas.height);
 
                 if (event.type == "mousedown" || event.type == "touchstart") {
                     var closestDistance = Number.MAX_VALUE;
