@@ -18,6 +18,7 @@
                 --red: hsl(0deg 75% 45%);
                 --yellow: hsl(50deg 100% 45%);
             }
+
             * {
                 margin: 0;
                 padding: 0;
@@ -72,16 +73,16 @@
             var ballRadius = 0.4;
 
             var hoops = [
-                {'x': 7, 'y': 7},
-                {'x': 7 + 7, 'y': 7 + 3.5},
-                {'x': 28 - 7, 'y': 7},
+                { x: 7, y: 7 },
+                { x: 7 + 7, y: 7 + 3.5 },
+                { x: 28 - 7, y: 7 },
 
-                {'x': 7, 'y': 35 - 7, 'color': "hoopblue"},
-                {'x': 7 + 7, 'y': 35 - 7 - 3.5, 'color': "hoopred"},
-                {'x': 28 - 7, 'y': 35 - 7},
-            ]
+                { x: 7, y: 35 - 7, color: "hoopblue" },
+                { x: 7 + 7, y: 35 - 7 - 3.5, color: "hoopred" },
+                { x: 28 - 7, y: 35 - 7 },
+            ];
 
-            var peg = {'x': 28 / 2, 'y': 35 / 2};
+            var peg = { x: 28 / 2, y: 35 / 2 };
             var pegRadius = 0.15;
 
             var draggingBall = -1;
@@ -149,7 +150,7 @@
                 return { x: circle1X, y: circle1Y };
             }
 
-            function collideAndResolve(a, aRadius, b, bRadius) {                
+            function collideAndResolve(a, aRadius, b, bRadius) {
                 if (collideCircle(a.x, a.y, aRadius, b.x, b.y, bRadius)) {
                     var c = resolveCircle(a.x, a.y, aRadius, b.x, b.y, bRadius);
                     a.x = c.x;
@@ -181,7 +182,7 @@
 
                 for (var i = 0; i < hoops.length; i++) {
                     var hoop = hoops[i];
-                    drawHoop(hoop.x, hoop.y, hoop.color)
+                    drawHoop(hoop.x, hoop.y, hoop.color);
                 }
 
                 fillCircle(context, peg.x * yard, peg.y * yard, pegRadius * yard, getColor("hoop"));
@@ -201,7 +202,6 @@
                             inputX = event.targetTouches[0].clientX;
                             inputY = event.targetTouches[0].clientY;
                         }
-
                         break;
                     default:
                         inputX = event.clientX;
@@ -245,20 +245,19 @@
                         activeBall.x = Math.min(Math.max(inputX - draggingOffsetX, 0), gameCanvas.width) / yard;
                         activeBall.y = Math.min(Math.max(inputY - draggingOffsetY, 0), gameCanvas.height) / yard;
 
-                        collideAndResolve(activeBall, ballRadius, peg, pegRadius);                    
+                        collideAndResolve(activeBall, ballRadius, peg, pegRadius);
 
                         for (var i = 0; i < hoops.length; i++) {
                             var hoop = hoops[i];
-                            collideAndResolve(activeBall, ballRadius, {'x': hoop.x - 0.5, 'y': hoop.y}, 0.05);
-                            collideAndResolve(activeBall, ballRadius, {'x': hoop.x + 0.5, 'y': hoop.y}, 0.05);
+                            collideAndResolve(activeBall, ballRadius, { x: hoop.x - 0.5, y: hoop.y }, 0.05);
+                            collideAndResolve(activeBall, ballRadius, { x: hoop.x + 0.5, y: hoop.y }, 0.05);
                         }
-
 
                         for (var i = 0; i < balls.length; i++) {
                             if (i == draggingBall) {
                                 continue;
                             }
-                            collideAndResolve(activeBall, ballRadius, balls[i], ballRadius)
+                            collideAndResolve(activeBall, ballRadius, balls[i], ballRadius);
                         }
                     }
                 }
