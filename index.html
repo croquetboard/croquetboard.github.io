@@ -67,7 +67,7 @@
                 return getComputedStyle(document.documentElement).getPropertyValue("--" + name);
             }
 
-            function fillCircle(x, y, radius, color) {
+            function fillCircle(context, x, y, radius, color) {
                 context.fillStyle = color;
                 context.beginPath();
                 context.arc(x, y, radius, 0, Math.PI * 2);
@@ -158,7 +158,7 @@
 
                 for (var i = 0; i < balls.length; i++) {
                     var a = balls[i];
-                    fillCircle(a.x, a.y, a.radius, getColor(a.color));
+                    fillCircle(context, a.x, a.y, a.radius, getColor(a.color));
                 }
 
                 drawHoop(7, 7);
@@ -167,7 +167,7 @@
                 drawHoop(28 - 7, 35 - 7);
                 drawHoop(7 + 7, 7 + 3.5);
                 drawHoop(7 + 7, 35 - 7 - 3.5);
-                fillCircle((28 / 2) * yard, (35 / 2) * yard, 0.15 * yard, getColor("hoop"));
+                fillCircle(context, (28 / 2) * yard, (35 / 2) * yard, 0.15 * yard, getColor("hoop"));
             }
 
             function handleInput(event) {
@@ -243,6 +243,21 @@
             context.canvas.addEventListener("touchend", handleInput, { passive: false });
             context.canvas.addEventListener("touchmove", handleInput, { passive: false });
             context.canvas.addEventListener("touchstart", handleInput, { passive: false });
+
+            function setFavicon() {
+                var canvas = document.createElement("canvas");
+                canvas.width = 16;
+                canvas.height = 16;
+                var context = canvas.getContext("2d");
+                fillCircle(context, 8, 8, 8, getColor("blue"));
+                var link = document.createElement("link");
+                link.type = "image/x-icon";
+                link.rel = "shortcut icon";
+                link.href = canvas.toDataURL("image/x-icon");
+                document.getElementsByTagName("head")[0].appendChild(link);
+            }
+
+            setFavicon();
         </script>
     </body>
 </html>
