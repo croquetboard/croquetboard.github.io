@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+
+        <title>croquet balls</title>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            html {
+                height: 100%;
+                width: 100%;
+            }
+
+            body {
+                background-color: #202830;
+                display: grid;
+                height: 100%;
+                justify-items: center;
+                width: 100%;
+            }
+
+            canvas {
+                height: 100%;
+                width: 100%;
+                background-color: #324558;
+            }
+
+            #gameArea {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="gameArea">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <script type="text/javascript">
+            var gameArea = document.getElementById("gameArea");
+            var gameCanvas = document.getElementById("gameCanvas");
+            var context = document.getElementById("gameCanvas").getContext("2d");
+
+            var yard;
+
+            var dragging = false;
+            var draggingBall;
+
+            var balls;
+
+            function fillCircle(x, y, radius, color) {
+                context.fillStyle = color;
+                context.beginPath();
+                context.arc(x, y, radius, 0, Math.PI * 2);
+                context.fill();
+            }
+
+            function resizeGame() {
+                var widthToHeight = 5 / 4;
+                var newWidth = window.innerWidth;
+                var newHeight = window.innerHeight;
+                var newWidthToHeight = newWidth / newHeight;
+
+                if (newWidthToHeight > widthToHeight) {
+                    newWidth = newHeight * widthToHeight;
+                    gameArea.style.height = newHeight + "px";
+                    gameArea.style.width = newWidth + "px";
+                } else {
+                    newHeight = newWidth / widthToHeight;
+                    gameArea.style.width = newWidth + "px";
+                    gameArea.style.height = newHeight + "px";
+                }
+
+                gameArea.style.marginTop = -newHeight / 2 + "px";
+                gameArea.style.marginLeft = -newWidth / 2 + "px";
+
+                gameCanvas.width = newWidth;
+                gameCanvas.height = newHeight;
+
+                yard = gameCanvas.width / 35;
+
+                var radius = 0.4 * yard;
+                balls = [
+                    { x: 17 * yard, y: 1 * yard, radius: radius, color: "#a83832" },
+                    { x: 1 * yard, y: 3 * yard, radius: radius, color: "#111111" },
+                    { x: 5 * yard, y: 6 * yard, radius: radius, color: "#255194" },
+                    { x: 9 * yard, y: 9 * yard, radius: radius, color: "#948225" },
+                ];
+
+                draw();
+            }
+
+            resizeGame();
+
+            function collideCircle(circle1, circle2) {
+                var distance_x = circle1.x - circle2.x;
+                var distance_y = circle1.y - circle2.y;
+                var radii_sum = circle1.radius + circle2.radius;
+                return distance_x * distance_x + distance_y * distance_y <= radii_sum * radii_sum;
+            }
+
+            function resolveCircle(c1, c2) {
+                var distance_x = c1.x - c2.x;
+                var distance_y = c1.y - c2.y;
+                var radii_sum = c1.radius + c2.radius;
+                var length = Math.sqrt(distance_x * distance_x + distance_y * distance_y) || 1;
+                var unit_x = distance_x / length;
+                var unit_y = distance_y / length;
+
+                c1.x = c2.x + (radii_sum + 1) * unit_x;
+                c1.y = c2.y + (radii_sum + 1) * unit_y;
+            }
+
+            function collideAndResolve(circle1, circle2) {
+                if (collideCircle(circle1, circle2)) {
+                    resolveCircle(circle1, circle2);
+                }
+            }
+
+            function distanceBetweenPoints(x1, y1, x2, y2) {
+                var a = x1 - x2;
+                var b = y1 - y2;
+                var c = Math.hypot(a, b);
+                return c;
+            }
+
+            function drawHoop(x, y) {
+                var realx = x * yard;
+                var realy = y * yard;
+                context.fillStyle = "#cccccc";
+                context.fillRect(realx, realy, 0.1 * yard, yard);
+            }
+
+            function draw() {
+                context.fillStyle = "#283038";
+                context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
+                for (var i = 0; i < balls.length; i++) {
+                    var a = balls[i];
+                    fillCircle(a.x, a.y, a.radius, a.color);
+                }
+
+                drawHoop(7, 7);
+                drawHoop(7, 28 - 7);
+                drawHoop(35 - 7, 7);
+                drawHoop(35 - 7, 28 - 7);
+                drawHoop(7 + 3.5, 7 + 7);
+                drawHoop(35 - 7 - 3.5, 7 + 7);
+                fillCircle((35 / 2) * yard, (28 / 2) * yard, 0.15 * yard, "#cccccc");
+            }
+
+            function handleInput(event) {
+                event.preventDefault();
+
+                var x = undefined;
+                var y = undefined;
+
+                switch (event.type) {
+                    case "touchend":
+                    case "touchmove":
+                    case "touchstart":
+                        x = event.targetTouches[0].clientX;
+                        y = event.targetTouches[0].clientY;
+
+                        break;
+                    default:
+                        x = event.clientX;
+                        y = event.clientY;
+                }
+
+                var canvas_rectangle = context.canvas.getBoundingClientRect();
+
+                x -= canvas_rectangle.left;
+                y -= canvas_rectangle.top;
+
+                if (event.type == "mousedown" || event.type == "touchstart") {
+                    var closest = Number.MAX_VALUE;
+
+                    for (var i = 0; i < balls.length; i++) {
+                        var a = balls[i];
+                        var d = distanceBetweenPoints(x, y, a.x, a.y);
+                        if (d < closest) {
+                            draggingBall = i;
+                            closest = d;
+                        }
+                    }
+
+                    if (closest < 5 * yard) {
+                        dragging = true;
+                    }
+                }
+
+                if (event.type == "mouseup" || event.type == "touchend" || event.type == "mouseleave") {
+                    dragging = false;
+                }
+
+                if (event.type == "mousemove" || event.type == "touchmove") {
+                    if (dragging) {
+                        balls[draggingBall].x = x;
+                        balls[draggingBall].y = y;
+
+                        for (var i = 0; i < balls.length; i++) {
+                            if (i == draggingBall) {
+                                continue;
+                            }
+                            collideAndResolve(balls[draggingBall], balls[i]);
+                        }
+                    }
+                }
+
+                draw();
+            }
+
+            window.addEventListener("resize", resizeGame, false);
+            window.addEventListener("orientationchange", resizeGame, false);
+
+            context.canvas.addEventListener("mousemove", handleInput, { passive: false });
+            context.canvas.addEventListener("mousedown", handleInput, { passive: false });
+            context.canvas.addEventListener("mouseup", handleInput, { passive: false });
+            context.canvas.addEventListener("mouseleave", handleInput, { passive: false });
+
+            context.canvas.addEventListener("touchend", handleInput, { passive: false });
+            context.canvas.addEventListener("touchmove", handleInput, { passive: false });
+            context.canvas.addEventListener("touchstart", handleInput, { passive: false });
+        </script>
+    </body>
+</html>
