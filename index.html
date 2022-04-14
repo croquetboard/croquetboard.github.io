@@ -10,8 +10,8 @@
                 --lawn: hsl(135deg, 60%, 40%);
 
                 --hoop: hsl(0deg, 0%, 95%);
-                --hoopblue: hsl(220deg 85% 40%);
-                --hoopred: hsl(0deg 75% 45%);
+                --hoopblue: hsl(220deg 85% 50%);
+                --hoopred: hsl(0deg 75% 55%);
 
                 --black: hsl(0deg 0% 15%);
                 --blue: hsl(220deg 85% 40%);
@@ -62,11 +62,31 @@
 
             var yard;
 
+            var balls = [
+                { x: 28 / 2 - 4, y: 35 / 2, color: "black" },
+                { x: 28 / 2 - 2, y: 35 / 2, color: "blue" },
+                { x: 28 / 2 + 2, y: 35 / 2, color: "red" },
+                { x: 28 / 2 + 4, y: 35 / 2, color: "yellow" },
+            ];
+
+            var ballRadius = 0.4;
+
+            var hoops = [
+                {'x': 7, 'y': 7},
+                {'x': 7 + 7, 'y': 7 + 3.5},
+                {'x': 28 - 7, 'y': 7},
+
+                {'x': 7, 'y': 35 - 7, 'color': "hoopblue"},
+                {'x': 7 + 7, 'y': 35 - 7 - 3.5, 'color': "hoopred"},
+                {'x': 28 - 7, 'y': 35 - 7},
+            ]
+
+            var peg = {'x': 28 / 2, 'y': 35 / 2};
+            var pegRadius = 0.15;
+
             var draggingBall = -1;
             var draggingOffsetX;
             var draggingOffsetY;
-
-            var balls;
 
             function getColor(name) {
                 return getComputedStyle(document.documentElement).getPropertyValue("--" + name);
@@ -103,53 +123,46 @@
 
                 yard = gameCanvas.width / 28;
 
-                var radius = 0.4 * yard;
-                balls = [
-                    { x: (28 / 2 - 4) * yard, y: (35 / 2) * yard, radius: radius, color: "black" },
-                    { x: (28 / 2 - 2) * yard, y: (35 / 2) * yard, radius: radius, color: "blue" },
-                    { x: (28 / 2 + 2) * yard, y: (35 / 2) * yard, radius: radius, color: "red" },
-                    { x: (28 / 2 + 4) * yard, y: (35 / 2) * yard, radius: radius, color: "yellow" },
-                ];
-
                 draw();
             }
 
             resizeGame();
 
-            function collideCircle(circle1, circle2) {
-                var distance_x = circle1.x - circle2.x;
-                var distance_y = circle1.y - circle2.y;
-                var radii_sum = circle1.radius + circle2.radius;
-                return distance_x * distance_x + distance_y * distance_y <= radii_sum * radii_sum;
+            function collideCircle(circle1X, circle1Y, circle1Radius, circle2X, circle2Y, circle2Radius) {
+                var distanceX = circle1X - circle2X;
+                var distanceY = circle1Y - circle2Y;
+                var radiiSum = circle1Radius + circle2Radius;
+                return distanceX * distanceX + distanceY * distanceY <= radiiSum * radiiSum;
             }
 
-            function resolveCircle(c1, c2) {
-                var distance_x = c1.x - c2.x;
-                var distance_y = c1.y - c2.y;
-                var radii_sum = c1.radius + c2.radius;
-                var length = Math.sqrt(distance_x * distance_x + distance_y * distance_y) || 1;
-                var unit_x = distance_x / length;
-                var unit_y = distance_y / length;
+            function resolveCircle(circle1X, circle1Y, circle1Radius, circle2X, circle2Y, circle2Radius) {
+                var distanceX = circle1X - circle2X;
+                var distanceY = circle1Y - circle2Y;
+                var radiiSum = circle1Radius + circle2Radius;
+                var length = Math.sqrt(distanceX * distanceX + distanceY * distanceY) || 1;
+                var unitX = distanceX / length;
+                var unitY = distanceY / length;
 
-                c1.x = c2.x + (radii_sum + 1) * unit_x;
-                c1.y = c2.y + (radii_sum + 1) * unit_y;
+                circle1X = circle2X + radiiSum * unitX;
+                circle1Y = circle2Y + radiiSum * unitY;
+
+                return { x: circle1X, y: circle1Y };
             }
 
-            function collideAndResolve(circle1, circle2) {
-                if (collideCircle(circle1, circle2)) {
-                    resolveCircle(circle1, circle2);
+            function collideAndResolve(a, aRadius, b, bRadius) {                
+                if (collideCircle(a.x, a.y, aRadius, b.x, b.y, bRadius)) {
+                    var c = resolveCircle(a.x, a.y, aRadius, b.x, b.y, bRadius);
+                    a.x = c.x;
+                    a.y = c.y;
                 }
             }
 
             function distanceBetweenPoints(x1, y1, x2, y2) {
-                var a = x1 - x2;
-                var b = y1 - y2;
-                var c = Math.hypot(a, b);
-                return c;
+                return Math.hypot(x1 - x2, y1 - y2);
             }
 
-            function drawHoop(x, y, color="hoop") {
-                var w = yard;
+            function drawHoop(x, y, color = "hoop") {
+                var w = 1 * yard;
                 var h = 0.15 * yard;
                 var ax = x * yard - w / 2;
                 var ay = y * yard - h / 2;
@@ -162,59 +175,55 @@
                 context.fillRect(0, 0, context.canvas.width, context.canvas.height);
 
                 for (var i = 0; i < balls.length; i++) {
-                    var a = balls[i];
-                    fillCircle(context, a.x, a.y, a.radius, getColor(a.color));
+                    var ball = balls[i];
+                    fillCircle(context, ball.x * yard, ball.y * yard, ballRadius * yard, getColor(ball.color));
                 }
 
-                drawHoop(7, 7);  
-                drawHoop(7 + 7, 7 + 3.5);
-                drawHoop(28 - 7, 7);
+                for (var i = 0; i < hoops.length; i++) {
+                    var hoop = hoops[i];
+                    drawHoop(hoop.x, hoop.y, hoop.color)
+                }
 
-                drawHoop(7, 35 - 7, 'hoopblue');
-                drawHoop(7 + 7, 35 - 7 - 3.5, 'hoopred');
-                drawHoop(28 - 7, 35 - 7);
-
-                fillCircle(context, (28 / 2) * yard, (35 / 2) * yard, 0.15 * yard, getColor("hoop"));
+                fillCircle(context, peg.x * yard, peg.y * yard, pegRadius * yard, getColor("hoop"));
             }
 
             function handleInput(event) {
                 event.preventDefault();
 
-                var x = undefined;
-                var y = undefined;
+                var inputX = undefined;
+                var inputY = undefined;
 
                 switch (event.type) {
                     case "touchend":
                     case "touchmove":
                     case "touchstart":
-
                         if (event.targetTouches.length > 0) {
-                            x = event.targetTouches[0].clientX;
-                            y = event.targetTouches[0].clientY;
+                            inputX = event.targetTouches[0].clientX;
+                            inputY = event.targetTouches[0].clientY;
                         }
 
                         break;
                     default:
-                        x = event.clientX;
-                        y = event.clientY;
+                        inputX = event.clientX;
+                        inputY = event.clientY;
                 }
 
                 var canvas_rectangle = context.canvas.getBoundingClientRect();
-                x -= canvas_rectangle.left;
-                y -= canvas_rectangle.top;
-                
+                inputX -= canvas_rectangle.left;
+                inputY -= canvas_rectangle.top;
+
                 if (event.type == "mousedown" || event.type == "touchstart") {
                     var closestDistance = Number.MAX_VALUE;
                     var closestBall;
 
                     for (var i = 0; i < balls.length; i++) {
-                        var a = balls[i];
-                        var d = distanceBetweenPoints(x, y, a.x, a.y);
+                        var ball = balls[i];
+                        var d = distanceBetweenPoints(inputX, inputY, ball.x * yard, ball.y * yard);
                         if (d < closestDistance) {
                             closestBall = i;
                             closestDistance = d;
-                            closestOffsetX = x - a.x;
-                            closestOffsetY = y - a.y;
+                            closestOffsetX = inputX - ball.x * yard;
+                            closestOffsetY = inputY - ball.y * yard;
                         }
                     }
 
@@ -230,15 +239,26 @@
                 }
 
                 if (event.type == "mousemove" || event.type == "touchmove") {
-                    if (draggingBall != -1) {                                
-                        balls[draggingBall].x = Math.min(Math.max(x - draggingOffsetX, 0), gameCanvas.width);
-                        balls[draggingBall].y = Math.min(Math.max(y - draggingOffsetY, 0), gameCanvas.height);
+                    if (draggingBall != -1) {
+                        var activeBall = balls[draggingBall];
+
+                        activeBall.x = Math.min(Math.max(inputX - draggingOffsetX, 0), gameCanvas.width) / yard;
+                        activeBall.y = Math.min(Math.max(inputY - draggingOffsetY, 0), gameCanvas.height) / yard;
+
+                        collideAndResolve(activeBall, ballRadius, peg, pegRadius);                    
+
+                        for (var i = 0; i < hoops.length; i++) {
+                            var hoop = hoops[i];
+                            collideAndResolve(activeBall, ballRadius, {'x': hoop.x - 0.5, 'y': hoop.y}, 0.05);
+                            collideAndResolve(activeBall, ballRadius, {'x': hoop.x + 0.5, 'y': hoop.y}, 0.05);
+                        }
+
 
                         for (var i = 0; i < balls.length; i++) {
                             if (i == draggingBall) {
                                 continue;
                             }
-                            collideAndResolve(balls[draggingBall], balls[i]);
+                            collideAndResolve(activeBall, ballRadius, balls[i], ballRadius)
                         }
                     }
                 }
