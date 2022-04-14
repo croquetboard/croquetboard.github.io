@@ -59,6 +59,8 @@
             var yard;
 
             var draggingBall = -1;
+            var draggingOffsetX;
+            var draggingOffsetY;
 
             var balls;
 
@@ -208,11 +210,15 @@
                         if (d < closestDistance) {
                             closestBall = i;
                             closestDistance = d;
+                            closestOffsetX = x - a.x;
+                            closestOffsetY = y - a.y;
                         }
                     }
 
                     if (closestDistance < 5 * yard) {
                         draggingBall = closestBall;
+                        draggingOffsetX = closestOffsetX;
+                        draggingOffsetY = closestOffsetY;
                     }
                 }
 
@@ -222,8 +228,8 @@
 
                 if (event.type == "mousemove" || event.type == "touchmove") {
                     if (draggingBall != -1) {
-                        balls[draggingBall].x = x;
-                        balls[draggingBall].y = y;
+                        balls[draggingBall].x = x - draggingOffsetX;
+                        balls[draggingBall].y = y - draggingOffsetY;
 
                         for (var i = 0; i < balls.length; i++) {
                             if (i == draggingBall) {
