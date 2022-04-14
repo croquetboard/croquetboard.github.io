@@ -6,13 +6,17 @@
 
         <style>
             :root {
-                --background: hsl(0, 0%, 70%);
-                --lawn: hsl(0, 0%, 80%);
-                --hoop: hsl(0, 0%, 40%);
-                --black: hsl(0, 0%, 20%);
-                --blue: hsl(216, 60%, 35%);
-                --red: hsl(3, 60%, 40%);
-                --yellow: hsl(50, 60%, 35%);
+                --background: hsl(0deg, 0%, 15%);
+                --lawn: hsl(135deg, 60%, 40%);
+
+                --hoop: hsl(0deg, 0%, 95%);
+                --hoopblue: hsl(220deg 85% 40%);
+                --hoopred: hsl(0deg 75% 45%);
+
+                --black: hsl(0deg 0% 15%);
+                --blue: hsl(220deg 85% 40%);
+                --red: hsl(0deg 75% 45%);
+                --yellow: hsl(50deg 100% 45%);
             }
             * {
                 margin: 0;
@@ -144,12 +148,12 @@
                 return c;
             }
 
-            function drawHoop(x, y) {
+            function drawHoop(x, y, color="hoop") {
                 var w = yard;
                 var h = 0.15 * yard;
                 var ax = x * yard - w / 2;
                 var ay = y * yard - h / 2;
-                context.fillStyle = getColor("hoop");
+                context.fillStyle = getColor(color);
                 context.fillRect(ax, ay, w, h);
             }
 
@@ -162,12 +166,14 @@
                     fillCircle(context, a.x, a.y, a.radius, getColor(a.color));
                 }
 
-                drawHoop(7, 7);
-                drawHoop(28 - 7, 7);
-                drawHoop(7, 35 - 7);
-                drawHoop(28 - 7, 35 - 7);
+                drawHoop(7, 7);  
                 drawHoop(7 + 7, 7 + 3.5);
-                drawHoop(7 + 7, 35 - 7 - 3.5);
+                drawHoop(28 - 7, 7);
+
+                drawHoop(7, 35 - 7, 'hoopblue');
+                drawHoop(7 + 7, 35 - 7 - 3.5, 'hoopred');
+                drawHoop(28 - 7, 35 - 7);
+
                 fillCircle(context, (28 / 2) * yard, (35 / 2) * yard, 0.15 * yard, getColor("hoop"));
             }
 
