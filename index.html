@@ -58,8 +58,7 @@
 
             var yard;
 
-            var dragging = false;
-            var draggingBall;
+            var draggingBall = -1;
 
             var balls;
 
@@ -180,8 +179,11 @@
                     case "touchend":
                     case "touchmove":
                     case "touchstart":
-                        x = event.targetTouches[0].clientX;
-                        y = event.targetTouches[0].clientY;
+
+                        if (event.targetTouches.length > 0) {
+                            x = event.targetTouches[0].clientX;
+                            y = event.targetTouches[0].clientY;
+                        }
 
                         break;
                     default:
@@ -195,28 +197,29 @@
                 y -= canvas_rectangle.top;
 
                 if (event.type == "mousedown" || event.type == "touchstart") {
-                    var closest = Number.MAX_VALUE;
+                    var closestDistance = Number.MAX_VALUE;
+                    var closestBall;
 
                     for (var i = 0; i < balls.length; i++) {
                         var a = balls[i];
                         var d = distanceBetweenPoints(x, y, a.x, a.y);
-                        if (d < closest) {
-                            draggingBall = i;
-                            closest = d;
+                        if (d < closestDistance) {
+                            closestBall = i;
+                            closestDistance = d;
                         }
                     }
 
-                    if (closest < 5 * yard) {
-                        dragging = true;
+                    if (closestDistance < 5 * yard) {
+                        draggingBall = closestBall;
                     }
                 }
 
                 if (event.type == "mouseup" || event.type == "touchend" || event.type == "mouseleave") {
-                    dragging = false;
+                    draggingBall = -1;
                 }
 
                 if (event.type == "mousemove" || event.type == "touchmove") {
-                    if (dragging) {
+                    if (draggingBall != -1) {
                         balls[draggingBall].x = x;
                         balls[draggingBall].y = y;
 
