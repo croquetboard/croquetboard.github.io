@@ -191,8 +191,13 @@
             function handleInput(event) {
                 event.preventDefault();
 
-                var inputX = undefined;
-                var inputY = undefined;
+                if (event.type == "mousemove" && !primaryMouseButtonDown && draggingBall != -1) {
+                    draggingBall = -1;
+                    return;
+                }
+
+                var inputX;
+                var inputY;
 
                 switch (event.type) {
                     case "touchend":
@@ -234,7 +239,7 @@
                     }
                 }
 
-                if (event.type == "mouseup" || event.type == "touchend" || event.type == "mouseleave") {
+                if (event.type == "mouseup" || event.type == "touchend") {
                     draggingBall = -1;
                 }
 
@@ -268,14 +273,24 @@
             window.addEventListener("resize", resizeGame, false);
             window.addEventListener("orientationchange", resizeGame, false);
 
-            context.canvas.addEventListener("mousemove", handleInput, { passive: false });
-            context.canvas.addEventListener("mousedown", handleInput, { passive: false });
-            context.canvas.addEventListener("mouseup", handleInput, { passive: false });
-            context.canvas.addEventListener("mouseleave", handleInput, { passive: false });
+            document.addEventListener("mousemove", handleInput, { passive: false });
+            document.addEventListener("mousedown", handleInput, { passive: false });
+            document.addEventListener("mouseup", handleInput, { passive: false });
 
-            context.canvas.addEventListener("touchend", handleInput, { passive: false });
-            context.canvas.addEventListener("touchmove", handleInput, { passive: false });
-            context.canvas.addEventListener("touchstart", handleInput, { passive: false });
+            document.addEventListener("touchend", handleInput, { passive: false });
+            document.addEventListener("touchmove", handleInput, { passive: false });
+            document.addEventListener("touchstart", handleInput, { passive: false });
+
+            var primaryMouseButtonDown = false;
+
+            function setPrimaryButtonState(e) {
+                var flags = e.buttons !== undefined ? e.buttons : e.which;
+                primaryMouseButtonDown = (flags & 1) === 1;
+            }
+
+            document.addEventListener("mousedown", setPrimaryButtonState);
+            document.addEventListener("mousemove", setPrimaryButtonState);
+            document.addEventListener("mouseup", setPrimaryButtonState);
 
             function setFavicon(rel, d) {
                 var canvas = document.createElement("canvas");
