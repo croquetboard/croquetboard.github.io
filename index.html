@@ -2,8 +2,6 @@
 
 <html>
     <head>
-        <meta name="viewport" content="width=device-width" />
-
         <title>croquet balls</title>
 
         <style>
@@ -35,7 +33,7 @@
                 width: 100%;
             }
 
-            canvas {
+            #gameCanvas {
                 height: 100%;
                 width: 100%;
             }
@@ -44,8 +42,6 @@
                 position: absolute;
                 left: 50%;
                 top: 50%;
-                width: 100%;
-                height: 100%;
             }
         </style>
     </head>
@@ -104,10 +100,10 @@
 
                 var radius = 0.4 * yard;
                 balls = [
-                    { x: (28 / 2 - 4) * yard, y: 35 / 2 * yard, radius: radius, color: "black" },
-                    { x: (28 / 2 - 2) * yard, y: 35 / 2 * yard, radius: radius, color: "blue" },
-                    { x: (28 / 2 + 2) * yard, y: 35 / 2 * yard, radius: radius, color: "red" },
-                    { x: (28 / 2 + 4) * yard, y: 35 / 2 * yard, radius: radius, color: "yellow" },
+                    { x: (28 / 2 - 4) * yard, y: (35 / 2) * yard, radius: radius, color: "black" },
+                    { x: (28 / 2 - 2) * yard, y: (35 / 2) * yard, radius: radius, color: "blue" },
+                    { x: (28 / 2 + 2) * yard, y: (35 / 2) * yard, radius: radius, color: "red" },
+                    { x: (28 / 2 + 4) * yard, y: (35 / 2) * yard, radius: radius, color: "yellow" },
                 ];
 
                 draw();
@@ -150,8 +146,8 @@
             function drawHoop(x, y) {
                 var w = yard;
                 var h = 0.15 * yard;
-                var ax = x * yard - w/2;
-                var ay = y * yard - h/2;
+                var ax = x * yard - w / 2;
+                var ay = y * yard - h / 2;
                 context.fillStyle = getColor("hoop");
                 context.fillRect(ax, ay, w, h);
             }
@@ -166,7 +162,7 @@
                 }
 
                 drawHoop(7, 7);
-                drawHoop(28 - 7, 7, );
+                drawHoop(28 - 7, 7);
                 drawHoop(7, 35 - 7);
                 drawHoop(28 - 7, 35 - 7);
                 drawHoop(7 + 7, 7 + 3.5);
