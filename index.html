@@ -279,14 +279,14 @@
 
             function setFavicon() {
                 var canvas = document.createElement("canvas");
-                canvas.width = 16;
-                canvas.height = 16;
+                var d = 192;
+                canvas.width = d;
+                canvas.height = d;
                 var context = canvas.getContext("2d");
-                fillCircle(context, 8, 8, 8, getColor("blue"));
+                fillCircle(context, d/2, d/2, d/2, getColor("yellow"));
                 var link = document.createElement("link");
-                link.type = "image/x-icon";
-                link.rel = "shortcut icon";
-                link.href = canvas.toDataURL("image/x-icon");
+                link.rel = "icon apple-touch-icon";
+                link.href = canvas.toDataURL();
                 document.getElementsByTagName("head")[0].appendChild(link);
             }
 
