@@ -269,6 +269,9 @@
                         activeBall.x = (inputX - draggingOffsetX) / yard;
                         activeBall.y = (inputY - draggingOffsetY) / yard;
 
+                        activeBall.x = Math.min(Math.max(activeBall.x * yard, ballRadius * yard), gameCanvas.width - ballRadius * yard) / yard;
+                        activeBall.y = Math.min(Math.max(activeBall.y * yard, ballRadius * yard), gameCanvas.height - ballRadius * yard) / yard;
+
                         collideAndResolve(activeBall, ballRadius, peg, pegRadius);
 
                         for (var i = 0; i < hoops.length; i++) {
@@ -283,9 +286,6 @@
                             }
                             collideAndResolve(activeBall, ballRadius, balls[i], ballRadius);
                         }
-
-                        activeBall.x = Math.min(Math.max(activeBall.x * yard, ballRadius * yard), gameCanvas.width - ballRadius * yard) / yard;
-                        activeBall.y = Math.min(Math.max(activeBall.y * yard, ballRadius * yard), gameCanvas.height - ballRadius * yard) / yard;
                     }
                 }
 
